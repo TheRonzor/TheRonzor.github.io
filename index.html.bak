@@ -77,5 +77,6 @@ function randomWalk(x0, y0, n) {
 }
 
       </script>
+    </canvas>
   </body>
 </html>
