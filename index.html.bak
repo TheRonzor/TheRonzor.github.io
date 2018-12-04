@@ -2,19 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
-    
   </head>
-  <body>
-    <canvas width="960" height="500">
+  <body> <canvas width="960" height="500"></canvas>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
 var canvas = document.querySelector("canvas"),
     context = canvas.getContext("2d"),
     width = canvas.width,
     height = canvas.height,
-    color = d3.scaleSequential(d3.interpolateRainbow).domain([0, 1000]),
+    color = d3.scaleSequential(d3.interpolateRainbow).domain([1000, 5000]),
     randomX = d3.randomNormal(0.3),
-    randomY = d3.randomNormal(0);
+    randomY = d3.randomNormal(0.01);
 
 render();
 
@@ -77,6 +75,6 @@ function randomWalk(x0, y0, n) {
 }
 
       </script>
-    </canvas>
+    
   </body>
 </html>
