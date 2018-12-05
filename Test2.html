@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>Ummm yeah</title>
+    <!-- script type="text/javascript" src="https://raw.github.com/jquery/sizzle/master/sizzle.js"></script -->
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.time.min.js"></script>
+    <style type="text/css">
+
+body {
+  font: 12px sans-serif;
+}
+
+.mouse_area {
+  opacity: 0;
+}
+.guides {
+  stroke-width: 1px;
+}
+.guides line {
+  stroke: #BBF;
+  shape-rendering: crispEdges;
+}
+.guides circle {
+  fill: #BBF;
+  stroke: #348;
+  opacity: 0.2;
+}
+
+
+.rules line, .rules path {
+  shape-rendering: crispEdges;
+  stroke: #000;
+}
+
+.rules .tick {
+}
+.rules .minor {
+  stroke: #BBB;
+}
+.rules .domain {
+  fill: none;
+}
+
+.grid .tick {
+  stroke: #CCC;
+}
+
+
+.series path {
+  fill: none;
+  stroke: #348;
+  stroke-width: 3px;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var w = 640;
+var h = 640;
+var x = d3.scale.linear().domain([-2, 2]).range([0,w]);
+var y = d3.scale.linear().domain([-2, 2]).range([h,0]);
+
+var pad = 50;
+var svg = d3.select("body")
+    .append("svg:svg")
+    .attr("height", h + pad)
+    .attr("width",  w + pad)
+
+var vis = svg.append("svg:g")
+    .attr("transform", "translate(40,20)")
+
+var signal = a_signal(5,2);
+      
+for (aa = 1; aa<100; aa++) {
+  var f = real_part_of_z(aa / 5 , 30);
+  var f2 = imag_part_of_z(3,1);
+  make_rules();
+  chart_line();
+}
+
+function a_signal(amp, freq) {
+	var s = Math.sin
+  return ( function(xi) { return amp * s(xi * freq) } );
+}
+      
+function real_part_of_z(r,t) {
+  var c = Math.cos
+  return ( function(xi) { return r * c(xi * t) } );
+}
+
+function imag_part_of_z(r,t) {
+  var s = Math.sin
+  return (function(xi) { return r * s(xi * t) } );
+}
+
+function chart_line() {
+  var g = vis.append("svg:g")
+      .classed("series", true)
+
+  g.append("svg:path")
+      .attr("d", function(d) { return d3.svg.line()(
+        x.ticks(1000).map(function(xi) {
+          return [ y(f(xi)), y(f2(xi)) ]
+        })
+       )})
+}
+
+// Make ruler lines
+function make_rules() {
+  var rules = vis.append("svg:g").classed("rules", true)
+
+  function make_x_axis() {
+    return d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(10)
+  }
+
+  function make_y_axis() {
+    return d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10)
+  }
+
+  rules.append("svg:g").classed("grid x_grid", true)
+      .attr("transform", "translate(0,"+h+")")
+      .call(make_x_axis()
+        .tickSize(-h,0,0)
+        .tickFormat("")
+      )
+
+  rules.append("svg:g").classed("grid y_grid", true)
+      .call(make_y_axis()
+        .tickSize(-w,0,0)
+        .tickFormat("")
+      )
+
+  rules.append("svg:g").classed("labels x_labels", true)
+      .attr("transform", "translate(0,"+h+")")
+      .call(make_x_axis()
+        .tickSize(5)
+        // .tickFormat(d3.time.format("%Y/%m"))
+      )
+
+  rules.append("svg:g").classed("labels y_labels", true)
+      .call(make_y_axis()
+        .tickSubdivide(1)
+        .tickSize(10, 5, 0)
+      )
+}
+
+
+    </script>
+  </body>
+</html>

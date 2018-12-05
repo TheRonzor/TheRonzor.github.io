@@ -3,10 +3,9 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
   </head>
-  <body> 
-    <h1>
-       Title
-    </h1>
+  <body>
+    <h1> Click to make a new random walk. Actual content coming
+      soon! </h1>
     <canvas width="960" height="500"></canvas>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script>
@@ -78,6 +77,100 @@ function randomWalk(x0, y0, n) {
   return points;
 }
 
-      </script>
+
+
+var w = 640;
+var h = 640;
+var x = d3.scale.linear().domain([-2, 20]).range([0,w]);
+var y = d3.scale.linear().domain([-3, 3]).range([h,0]);
+
+var pad = 50;
+var svg = d3.select("body")
+    .append("svg:svg")
+    .attr("height", h + pad)
+    .attr("width",  w + pad)
+
+var vis = svg.append("svg:g")
+    .attr("transform", "translate(4,5)")
+
+var legend = d3.select("body").append("div")
+    .classed("legend", true)
+
+var continuous = funky(1/3,1);
+
+make_rules();
+chart_line();
+
+
+function funky(a,b) {
+  var s = Math.sin
+  var c = Math.cos
+  var p = Math.pow
+  var e = Math.E
+  var pi = Math.PI
+  return (function(xi) {
+		return a * p(s(xi) , 2) / p(e , c(xi)) + pi / 2
+  });
+}
+
+function chart_line() {
+  var g = vis.append("svg:g")
+      .classed("series", true)
+
+  g.append("svg:path")
+      .attr("d", function(d) { return d3.svg.line()(
+        x.ticks(1000).map(function(xi) {
+          return [ x(xi), y(continuous(xi)) ]
+        })
+       )})
+}
+
+// Make ruler lines
+function make_rules() {
+  var rules = vis.append("svg:g").classed("rules", true)
+
+  function make_x_axis() {
+    return d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(10)
+  }
+
+  function make_y_axis() {
+    return d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10)
+  }
+
+  rules.append("svg:g").classed("grid x_grid", true)
+      .attr("transform", "translate(0,"+h+")")
+      .call(make_x_axis()
+        .tickSize(-h,0,0)
+        .tickFormat("")
+      )
+
+  rules.append("svg:g").classed("grid y_grid", true)
+      .call(make_y_axis()
+        .tickSize(-w,0,0)
+        .tickFormat("")
+      )
+
+  rules.append("svg:g").classed("labels x_labels", true)
+      .attr("transform", "translate(0,"+h+")")
+      .call(make_x_axis()
+        .tickSize(5)
+        // .tickFormat(d3.time.format("%Y/%m"))
+      )
+
+  rules.append("svg:g").classed("labels y_labels", true)
+      .call(make_y_axis()
+        .tickSubdivide(1)
+        .tickSize(10, 5, 0)
+      )
+}
+
+
+    </script>
   </body>
 </html>
