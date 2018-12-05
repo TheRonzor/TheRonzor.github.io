@@ -11,7 +11,6 @@
 body {
   font: 12px sans-serif;
 }
-
 .mouse_area {
   opacity: 0;
 }
@@ -57,8 +56,8 @@ body {
     </style>
   </head>
   <body>
+    <div id="slider"></div>
     <script type="text/javascript">
-
 var w = 640;
 var h = 640;
 var x = d3.scale.linear().domain([-2, 2]).range([0,w]);
@@ -72,29 +71,22 @@ var svg = d3.select("body")
 
 var vis = svg.append("svg:g")
     .attr("transform", "translate(40,20)")
-
-var signal = a_signal(5,2);
       
-for (aa = 1; aa<100; aa++) {
-  var f = real_part_of_z(aa / 5 , 30);
-  var f2 = imag_part_of_z(3,1);
-  make_rules();
-  chart_line();
-}
-
-function a_signal(amp, freq) {
-	var s = Math.sin
-  return ( function(xi) { return amp * s(xi * freq) } );
-}
+var winding = 5.153;
+var f = real_part_of_z(0,winding);
+var f2 = imag_part_of_z(0,winding);
+make_rules();
+chart_line();
       
-function real_part_of_z(r,t) {
-  var c = Math.cos
-  return ( function(xi) { return r * c(xi * t) } );
-}
-
-function imag_part_of_z(r,t) {
+function real_part_of_z(r,k) {
   var s = Math.sin
-  return (function(xi) { return r * s(xi * t) } );
+  var c = Math.cos
+  return ( function(xi) { return s(xi) * c(xi * k) } );
+}
+
+function imag_part_of_z(r,k) {
+  var s = Math.sin
+  return (function(xi) { return s(xi) * s(xi * k) } );
 }
 
 function chart_line() {
