@@ -5,34 +5,16 @@
     <title>Ummm yeah</title>
     <!-- script type="text/javascript" src="https://raw.github.com/jquery/sizzle/master/sizzle.js"></script -->
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
-    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.time.min.js"></script>
+    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
     <style type="text/css">
 
 body {
   font: 12px sans-serif;
 }
-.mouse_area {
-  opacity: 0;
-}
-.guides {
-  stroke-width: 1px;
-}
-.guides line {
-  stroke: #BBF;
-  shape-rendering: crispEdges;
-}
-.guides circle {
-  fill: #BBF;
-  stroke: #348;
-  opacity: 0.2;
-}
-
-
 .rules line, .rules path {
   shape-rendering: crispEdges;
   stroke: #000;
 }
-
 .rules .tick {
 }
 .rules .minor {
@@ -41,12 +23,9 @@ body {
 .rules .domain {
   fill: none;
 }
-
 .grid .tick {
   stroke: #CCC;
 }
-
-
 .series path {
   fill: none;
   stroke: #348;
@@ -55,99 +34,129 @@ body {
 
     </style>
   </head>
-  <body> <a href="Test2.html">Again!</a> 
-    <br>
+  <body> <br>
     <a href="index.html">Back</a>
     <script type="text/javascript">
-var w = 640;
-var h = 640;
-var x = d3.scale.linear().domain([-5, 5]).range([0,w]);
-var y = d3.scale.linear().domain([-5, 5]).range([h,0]);
+      var w = 640;
+      var h = 640;
+      var xmin = -5;
+      var xmax = 5;
+      var ymin = -5;
+      var ymax = 5;
+      var tmax = 10;
+      var x = d3.scale.linear().domain([xmin, xmax]).range([0,w]);
+      var y = d3.scale.linear().domain([ymin, ymax]).range([h,0]);
+      var t = d3.scale.linear().domain([0,tmax]).range([0,tmax]);
+      var pad = 50;
+      var svg = d3.select("body")
+				.append("svg:svg")
+				.attr("height", h + pad)
+				.attr("width",  w + pad)
+      var s = Math.sin
+      var c = Math.cos
+      const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length
+      var vis = svg.append("svg:g").attr("transform", "translate(40,20)")
+			make_rules();
+      var g = vis.append("svg:g").classed("series", true)
+      var winding = 0;
 
-var pad = 50;
-var svg = d3.select("body")
-    .append("svg:svg")
-    .attr("height", h + pad)
-    .attr("width",  w + pad)
-
-var vis = svg.append("svg:g")
-    .attr("transform", "translate(40,20)")
+      // Run the animation
+      d3.timer(function(elapsed) {
+        if (elapsed >200) {
+          winding = winding+0.01;
+          winding = winding % 10;
+          d3.select("#lastCurve").remove();
+          d3.select("#com").remove();
+          chart_line(winding);
+          center_of_mass(winding)
+        }
+      });
       
-var winding = 10 * Math.random();
-var f = real_part_of_z(0,winding);
-var f2 = imag_part_of_z(0,winding);
-make_rules();
-chart_line();
+      //svg.append("circle").attr("cx", x(0)).attr("cy", y(0)).attr("r",10).attr("fill","red")
       
-function real_part_of_z(r,k) {
-  var s = Math.sin
-  var c = Math.cos
-  return ( function(xi) { return (s(xi) + 2* s(2*xi)) * c(xi * k) } );
-}
+      function center_of_mass(w) {
+        fx = xt(w);
+        fy = yt(w);
+        xvals = t.ticks(1000).map(function(ti) { return ( fx(ti) ) });
+        yvals = t.ticks(1000).map(function(ti) { return ( fy(ti) ) });
+        xmean = arrAvg(xvals);
+        ymean = arrAvg(yvals);
+        svg.append("circle").attr("cx", x(xmean)+40).attr("cy", y(ymean)+20).attr("r",5).attr("fill","red").attr("id","com");
+      }
 
-function imag_part_of_z(r,k) {
-  var s = Math.sin
-  return (function(xi) { return (s(xi) + 2* s(2*xi)) * s(xi * k) } );
-}
+      function chart_line(w) {
+        fx = xt(w);
+        fy = yt(w);
+        g.append("svg:path").attr("id","lastCurve")
+            .attr("d", function(d) { return d3.svg.line()(
+              t.ticks(1000).map(function(ti) {
+                return [ x(fx(ti)), y(fy(ti)) ]
+              })
+             )})
+      }
+      
+      function xtest(k) {
+        return ( function(ti) { return (ti) });
+      }
+      function ytest(k) {
+        return ( function(ti) { return s(ti * k) });
+      }
+      
+      function xt(k) {
+        return ( function(t) { return ( MySignal(t) * c(k*t) )});
+      }
 
-function chart_line() {
-  var g = vis.append("svg:g")
-      .classed("series", true)
+      function yt(k) {
+        return (function(t) { return ( MySignal(t) * s(k*t) )});
+      }
+      function MySignal(t) {
+        return (s(t) +2*c(3*t) +1.5*s(7*t+5));
+      }
+      // Make ruler lines
+      function make_rules() {
+        var rules = vis.append("svg:g").classed("rules", true)
 
-  g.append("svg:path")
-      .attr("d", function(d) { return d3.svg.line()(
-        x.ticks(1000).map(function(xi) {
-          return [ y(f(xi)), y(f2(xi)) ]
-        })
-       )})
-}
+        function make_x_axis() {
+          return d3.svg.axis()
+              .scale(x)
+              .orient("bottom")
+              .ticks(10)
+        }
 
-// Make ruler lines
-function make_rules() {
-  var rules = vis.append("svg:g").classed("rules", true)
+        function make_y_axis() {
+          return d3.svg.axis()
+              .scale(y)
+              .orient("left")
+              .ticks(10)
+        }
 
-  function make_x_axis() {
-    return d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(10)
-  }
+        rules.append("svg:g").classed("grid x_grid", true)
+            .attr("transform", "translate(0,"+h+")")
+            .call(make_x_axis()
+              .tickSize(-h,0,0)
+              .tickFormat("")
+            )
 
-  function make_y_axis() {
-    return d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10)
-  }
+        rules.append("svg:g").classed("grid y_grid", true)
+            .call(make_y_axis()
+              .tickSize(-w,0,0)
+              .tickFormat("")
+            )
 
-  rules.append("svg:g").classed("grid x_grid", true)
-      .attr("transform", "translate(0,"+h+")")
-      .call(make_x_axis()
-        .tickSize(-h,0,0)
-        .tickFormat("")
-      )
+        rules.append("svg:g").classed("labels x_labels", true)
+            .attr("transform", "translate(0,"+h+")")
+            .call(make_x_axis()
+              .tickSize(5)
+              // .tickFormat(d3.time.format("%Y/%m"))
+            )
 
-  rules.append("svg:g").classed("grid y_grid", true)
-      .call(make_y_axis()
-        .tickSize(-w,0,0)
-        .tickFormat("")
-      )
-
-  rules.append("svg:g").classed("labels x_labels", true)
-      .attr("transform", "translate(0,"+h+")")
-      .call(make_x_axis()
-        .tickSize(5)
-        // .tickFormat(d3.time.format("%Y/%m"))
-      )
-
-  rules.append("svg:g").classed("labels y_labels", true)
-      .call(make_y_axis()
-        .tickSubdivide(1)
-        .tickSize(10, 5, 0)
-      )
-}
-
-
+        rules.append("svg:g").classed("labels y_labels", true)
+            .call(make_y_axis()
+              .tickSubdivide(1)
+              .tickSize(10, 5, 0)
+            )
+      }
     </script>
+    
   </body>
 </html>
