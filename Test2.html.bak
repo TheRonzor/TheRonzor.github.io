@@ -82,12 +82,12 @@ chart_line();
 function real_part_of_z(r,k) {
   var s = Math.sin
   var c = Math.cos
-  return ( function(xi) { return s(xi) + 2* s(2*xi) * c(xi * k) } );
+  return ( function(xi) { return (s(xi) + 2* s(2*xi)) * c(xi * k) } );
 }
 
 function imag_part_of_z(r,k) {
   var s = Math.sin
-  return (function(xi) { return s(xi) + 2* s(2*xi) * s(xi * k) } );
+  return (function(xi) { return (s(xi) + 2* s(2*xi)) * s(xi * k) } );
 }
 
 function chart_line() {
