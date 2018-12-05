@@ -6,9 +6,6 @@
     <!-- script type="text/javascript" src="https://raw.github.com/jquery/sizzle/master/sizzle.js"></script -->
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.time.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="stylesheets/d3.slider.css" media="screen" />
-<script src="javascripts/d3.v3.min.js"></script>
-<script src="javascripts/d3.slider.js"></script>
     <style type="text/css">
 
 body {
@@ -59,12 +56,12 @@ body {
     </style>
   </head>
   <body>
-    <div id="slider"></div>
+    <a href = "Test2.html">Again!</a>
     <script type="text/javascript">
 var w = 640;
 var h = 640;
-var x = d3.scale.linear().domain([-2, 2]).range([0,w]);
-var y = d3.scale.linear().domain([-2, 2]).range([h,0]);
+var x = d3.scale.linear().domain([-5, 5]).range([0,w]);
+var y = d3.scale.linear().domain([-5, 5]).range([h,0]);
 
 var pad = 50;
 var svg = d3.select("body")
@@ -75,7 +72,7 @@ var svg = d3.select("body")
 var vis = svg.append("svg:g")
     .attr("transform", "translate(40,20)")
       
-var winding = 5.153;
+var winding = 10 * Math.random();
 var f = real_part_of_z(0,winding);
 var f2 = imag_part_of_z(0,winding);
 make_rules();
@@ -84,12 +81,12 @@ chart_line();
 function real_part_of_z(r,k) {
   var s = Math.sin
   var c = Math.cos
-  return ( function(xi) { return s(xi) * c(xi * k) } );
+  return ( function(xi) { return s(xi) + 2* s(2*xi) * c(xi * k) } );
 }
 
 function imag_part_of_z(r,k) {
   var s = Math.sin
-  return (function(xi) { return s(xi) * s(xi * k) } );
+  return (function(xi) { return s(xi) + 2* s(2*xi) * s(xi * k) } );
 }
 
 function chart_line() {
