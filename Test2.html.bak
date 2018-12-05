@@ -57,6 +57,7 @@ body {
   </head>
   <body>
     <a href = "Test2.html">Again!</a>
+    <a href = "index.html">Back</a>
     <script type="text/javascript">
 var w = 640;
 var h = 640;
