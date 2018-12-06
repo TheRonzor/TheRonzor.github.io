@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Photography</title>
+  </head>
+  <body style="               background-color: black;"> <a href="index.html">Home</a><br>
+    <div style="width:image width px; font-size:80%; text-align: center"><img src="Oil2.jpg"
+        style="max-width: 75%; height: auto;">
+      <br>
+      <p style="color: white"> <font size="+1">Oil and water in a clear glass
+          bowl, gently stirred, with aluminum foil below. Lit with a gelled
+          speedlite from either side.</font></p>
+      <br>
+      <br>
+      <p style="color: white"> <em>This site is a work in progress, check
+          back later for more fun stuff! </em></p>
+    </div>
+  </body>
+</html>
