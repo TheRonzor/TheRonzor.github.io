@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+    <!-- Link to import the d3 javascript library -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <!-- Link to import the MathJax typesetting library -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+    <!-- My libraries -->
+    <script src='ronzor_lib1.js'></script>
+</head>
+    <body class="bd-main">
+        <!-- Navigation bar example -->
+        <div id="nav-bar-wrapper">
+            <ul class="nav-bar">
+                <li><a class="active" href="index.html">Home</a></li>
+                <li><a href="index.html">About</a></li>
+                <li><a href="index.html">Another Link</a></li>
+                <li><a href="index.html">Linky</a></li>
+            </ul>
+        </div>
+        <!-- Some text and headers.  Use the pad-top class to make sure it's below the nav-bar -->
+        <div class="pad-top">
+            <h1 class="h1-main"> h1-main class text </h1>
+            <p class="p-main"> p1-main class: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ornare, urna non dictum tincidunt, ligula lectus ornare lorem, in maximus tellus odio fermentum mauris. Phasellus congue dui a sapien vulputate aliquam. Donec feugiat metus sed nisl luctus, sed posuere dolor malesuada. In hac habitasse platea dictumst. Praesent facilisis finibus facilisis. Aliquam ullamcorper mattis erat. Etiam sollicitudin risus ut eros condimentum, ac posuere eros dignissim. Nam imperdiet pretium dolor ac sagittis. Nam pulvinar quis augue non cursus.</p>
+        </div>
+        <h2 class="h2-main">
+            h2-main class text
+            <br>
+            <br>
+            Some photos are below
+        </h2>
+        <p class="p-main"> They should resize with the browser window</p>
+        
+        <!-- Photo examples -->
+        <div id="photo-wrapper">
+            <div class="div-im">
+                <img src="BeerGarden.jpg" class="im-main">
+                <div class="div-caption">
+                    <p class="p-main">
+                        <strong>This is a caption</strong> describing this image. Aliquam ullamcorper mattis erat. Etiam sollicitudin risus ut eros condimentum, ac posuere eros dignissim. Nam imperdiet pretium dolor ac sagittis. Nam pulvinar quis augue non cursus.
+                    </p>
+                </div>
+            </div>
+            <div class="div-im">
+                <img src="Liquors.jpg" class="im-main">
+                <div class="div-caption">
+                    <p class="p-main">
+                        <strong>This is another caption</strong> describing another image. Aliquam ullamcorper mattis erat. Etiam sollicitudin risus ut eros condimentum, ac posuere eros dignissim. Nam imperdiet pretium dolor ac sagittis. Nam pulvinar quis augue non cursus.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Math examples using MathJax -->
+        <div id="math-wrapper">
+            <h2 class="h2-main">Some math below using MathJax</h2>
+            <p class="p-main">
+                It's very  \( \LaTeX \)-ey. 
+                <br>
+                <br>
+                The Fourier transform of \( f(t) \) is given by 
+            </p>
+            <p class="p-math">
+                $$F(\omega) =\int f(t) e^{i \omega t} dt$$
+            </p>
+        </div>
+        
+        <div>
+            <h1 class="h1-main">Now some plotting!</h1>
+        </div>
+        
+        <!-- Now for some javascript and d3! -->
+        <div id="d3-wrapper" style="background-color: gray" class="d3-center">
+            <script>
+                (function() {
+                // First create the canvas and svg
+                const w = 500, h=400;
+                var canvas = d3.select('#d3-wrapper')
+                    .append('canvas')
+                    .attr('width',w)
+                    .attr('height',h);
+                
+                // Also get the tools to draw on the canvas
+                var ctx = canvas.node().getContext('2d');
+                
+                // Worry about margins later - don't overcomplicate things
+                //
+                //const margin = {top: 20, right: 20, bottom: 30, left: 40};
+                //context.translate(margin.left, margin.top);
+
+                // Apparantly we don't use SVG anymore!
+                var customBase = document.createElement('custom');
+                var custom = d3.select(customBase);
+                
+                // Set the scale of the image - map coordinats to pixel space
+                const xMin = -5,
+                      xMax = 10,
+                      yMin = -2,
+                      yMax = 8;
+                var X = d3.scaleLinear()
+                    .domain([xMin,xMax])
+                    .range([0,w]);
+                var Y = d3.scaleLinear()
+                    .domain([yMin,yMax])
+                    .range([h,0])
+                var s = Math.sin;
+                
+                d3.interval(function(elapsed) {
+                    var k = 10*s(elapsed)*s(elapsed);
+                    drawAxes();
+                    plot_func(k);
+                }
+                        ,100);
+                
+                function plot_func(k) {
+                    const xSteps = 1000;
+                    const xStep = (xMax-xMin)/(xSteps);
+                    var f = my_func(k);
+                    x = xMin;
+                    ctx.beginPath();
+                    ctx.moveTo(X(x), Y(f(x)));
+                    while (x <= xMax) {
+                        ctx.lineTo(X(x), Y(f(x)));
+                        x=x+xStep;
+                    }
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "teal";
+                    ctx.stroke();
+                };
+                function my_func(k) {
+                    return ( 
+                        function(t) {
+                            return s(k*t)
+                        }
+                   )
+                };
+                function drawAxes() {
+                    ctx.clearRect(0,0,w,h);
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, w, h);
+                    
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "black";
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(X(0),0);
+                    ctx.lineTo(X(0),h);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0,Y(0));
+                    ctx.lineTo(w,Y(0));
+                    ctx.stroke();
+                    
+                    ctx.strokeRect(0,0,w,h);
+                };
+                    
+            }())
+            </script>
+        </div>
+        <br>
+        <p class="p-main"> The next one looks better when you zoom in. </p>
+        
+        <div id="d3-part3" style="background-color: gray" class="d3-center">
+            <script>
+                (function(){
+                    // Define dimensions and margins
+                    const margin={top:50,left:50,bottom:50,right:50},
+                          height = 600,
+                          width = 600,
+                          xMin = -2, xMax = 2, 
+                          yMin = -2, yMax = 2,
+                          tMin = 0, tMax = 20, tSteps = 1000-1;
+                    // This function will return the svg object as well as X,Y, and T as linearScale objects, 
+                    // and also draw the axes and background
+                    out = make_standard_axes("#d3-part3", height, width, margin, xMin, xMax, yMin, yMax, tMin, tMax, "white");
+                    svg = out[0];
+                    X = out[1];
+                    Y = out[2];
+                    T = out[3];
+                    
+                    // Mark zero - and make sure it's actually zero!
+                    svg.append("circle")
+                            .attr("cx", X(0))
+                            .attr("cy", Y(0))
+                            .attr("r",10)
+                            .attr("fill","pink")
+                            .attr("id","test_zero");
+                    
+                    // --------------- Now we do the actual plotting ----------------
+                    // --------------------------------------------------------------
+                    var winding = 0,
+                        wStep  = 0.005,
+                        wMax = 10;
+                        waitTime = 30;
+                    d3.interval(function(elapsed) {
+                        winding = winding + wStep;
+                        winding = winding % wMax;
+                        make_plot(winding);
+                        center_of_mass(winding);
+                        }, waitTime
+                    );
+                    // --------------------------------------------------------------
+                    // --------------------------------------------------------------
+                    
+                    // Variables to store the function evaluations
+                    var xt, yt
+                    // The rest of these functions are called during the plotting procedure
+                    function make_plot(k) {
+                        // This could be replaced with any function
+                        var f = fourier(k);
+                        
+                        // Evaluate the function
+                        xt = T.ticks(tSteps).map(function(ti) { return f[0](ti)} );
+                        yt = T.ticks(tSteps).map(function(ti) { return f[1](ti)} );
+                        
+                        // Build SVG path string.  (M)ove to first location, (L)ine to remaining locations.
+                        var path_d = 'M' + X(xt[0]) + ',' +Y(yt[0]);
+                        for (var i = 1; i < xt.length; i++) {
+                            path_d = path_d + ' L' + X(xt[i]) + ',' + Y(yt[i]);
+                        }
+                        
+                        // Remove the old stuff
+                        d3.select("#lastCurve2").remove();
+                        d3.select("#theTitle2").remove();
+                        
+                        // Add the new stuff
+                        svg.append('path')
+                            .attr('d', path_d)
+                            .attr("id", "lastCurve2")
+                            .style('fill','none')
+                            .style('stroke', 'blue')
+                            .style('stroke-width', '2px');
+                        svg.append("text")
+                            .attr("id", "theTitle2")
+                            .attr("x", (width - margin.top - margin.bottom)/2)
+                            .attr("y", -5)
+                            .style("text-anchor", "middle")
+                            .style("font-size", "16px")
+    					    .text("\u03c9 = " + (Math.round(winding*100)/100).toFixed(2));
+                        }
+                    // Return two functions of time based on an input parameter
+                    var s = Math.sin,
+                        c = Math.cos;
+                    function fourier(k) {
+                        var fx = function(t) { return ( MySignal(t)*c(k*t) )};
+                        var fy = function(t) { return ( MySignal(t)*s(k*t) )};
+                        return [fx,fy];
+                    }
+                    // The signal to be transformed
+                    function MySignal(t) {
+                        return (0.5*s(2*t) + 1.3*s(5*t + 0.7));
+                    }
+                    // Plot center of mass
+                    function center_of_mass(k) {
+                        const arrAvg = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
+                        xmean = 2*arrAvg(xt);
+                        ymean = 2*arrAvg(yt);
+                        d3.select("#cline2").remove();
+                        svg.append("line")
+                            .style("stroke", "red")
+                            .style('stroke-width', '2px')
+                            .attr("x1", X(0))
+                            .attr("y1", Y(0))
+                            .attr("x2", X(xmean))
+                            .attr("y2", Y(ymean))
+                            .attr("id", "cline2");
+                        d3.select("#com2").remove();
+                        svg.append("circle")
+                            .attr("cx", X(xmean))
+                            .attr("cy", Y(ymean))
+                            .attr("r",5)
+                            .attr("fill","red")
+                            .attr("id","com2");
+                        
+                    } 
+            }())
+            </script>
+        </div>
+        
+    </body>
+</html>
