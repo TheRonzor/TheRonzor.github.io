@@ -17,6 +17,9 @@
 .pad-top {
     margin-top: 80px;
 }
+.half-wide {
+    max-width: 500px;
+}
 /* Text styles */
 .h1-main {
     color: var(--front);
