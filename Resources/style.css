@@ -15,7 +15,10 @@
 }
 /* Div styles */
 .pad-top {
-    margin-top: 80px;
+    margin-top: 100px;
+}
+.half-wide {
+    max-width: 500px;
 }
 /* Text styles */
 .h1-main {
